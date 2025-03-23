@@ -133,9 +133,6 @@ Here’s a **GitHub-style table** summarizing the key input/output (I/O) signals
 ```
 
 ---
-
-This table and notes should help your customer understand how to interface with the `mkSoc` module. Let me know if you need further clarifications! 😊
----
 For more details on any component, refer to the Verilog codes in **"verilog"** folder or contact the maintainers.
 
 

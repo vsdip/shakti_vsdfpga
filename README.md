@@ -60,9 +60,6 @@ This differs from a **modular design**, where components like `clint` or `uart` 
 2. **FIFOs** (First-In-First-Out queues) buffer data to handle mismatches in communication speeds between components.
 3. The `fabric` (interconnect) uses **source/destination tagging** to route transactions between masters and slaves.
 
----
-
-For more details on any component, refer to the Verilog code or contact the maintainers.
 
 ---
 

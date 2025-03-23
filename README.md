@@ -63,7 +63,7 @@ This differs from a **modular design**, where components like `clint` or `uart` 
 
 ---
 
-Here’s a **GitHub-style table** summarizing the key input/output (I/O) signals of the `mkSoc` module, their meanings, and typical usage:
+Here’s a **table** summarizing the key input/output (I/O) signals of the `mkSoc` module, their meanings, and typical usage:
 
 ---
 

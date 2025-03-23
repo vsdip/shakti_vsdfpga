@@ -15,6 +15,7 @@ This document provides a high-level overview of the components in the System-on-
 2. [System Components](#system-components)
 3. [Design Style Explanation](#design-style-explanation)
 4. [Notes](#notes)
+5. [mkSoc Module I/O Signals](#`mkSoc`-Module-I/O-Signals)
 
 ---
 
@@ -63,11 +64,7 @@ This differs from a **modular design**, where components like `clint` or `uart` 
 
 ---
 
-Here’s a **table** summarizing the key input/output (I/O) signals of the `mkSoc` module, their meanings, and typical usage:
-
----
-
-# `mkSoc` Module I/O Signals
+## `mkSoc` Module I/O Signals
 
 | **Signal Name**                      | **Direction** | **Meaning**                                                                 | **Usage**                                                                 |
 |--------------------------------------|---------------|-----------------------------------------------------------------------------|---------------------------------------------------------------------------|

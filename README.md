@@ -4,6 +4,10 @@ Repo for shakti files
 ![image](https://github.com/user-attachments/assets/17d5aa33-fef9-4f01-aa01-206d655aa4ec)
 
 # Shakti SoC Details:
+Here’s the updated **GitHub `README.md`** with the **I/O Signals Table** added to the **Table of Contents**:
+
+---
+
 # System-on-Chip (SoC) Components Summary
 
 This document provides a high-level overview of the components in the System-on-Chip (SoC) described in the Verilog code.
@@ -14,8 +18,8 @@ This document provides a high-level overview of the components in the System-on-
 1. [Overview](#overview)
 2. [System Components](#system-components)
 3. [Design Style Explanation](#design-style-explanation)
-4. [Notes](#notes)
-5. [mkSoc Module I/O Signals](#`mkSoc`-Module-I/O-Signals)
+4. [I/O Signals of `mkSoc`](#io-signals-of-mksoc)
+5. [Notes](#notes)
 
 ---
 
@@ -56,15 +60,7 @@ This differs from a **modular design**, where components like `clint` or `uart` 
 
 ---
 
-## Notes
-1. **AXI4-Lite** is a simplified version of the AXI bus protocol used for register-like access (common in small SoCs).
-2. **FIFOs** (First-In-First-Out queues) buffer data to handle mismatches in communication speeds between components.
-3. The `fabric` (interconnect) uses **source/destination tagging** to route transactions between masters and slaves.
-
-
----
-
-## `mkSoc` Module I/O Signals
+## I/O Signals of `mkSoc`
 
 | **Signal Name**                      | **Direction** | **Meaning**                                                                 | **Usage**                                                                 |
 |--------------------------------------|---------------|-----------------------------------------------------------------------------|---------------------------------------------------------------------------|
@@ -113,20 +109,7 @@ This differs from a **modular design**, where components like `clint` or `uart` 
 
 ---
 
-## Example Connections
-```verilog
-// Clock/Reset
-.clk          (CLK),          // System clock (e.g., 50 MHz)
-.rst_n        (RST_N),        // Active-low reset (tie to reset button)
-
-// Main Memory AXI
-.main_mem_awaddr  (main_mem_awaddr),  // Connect to RAM controller
-.main_mem_wdata   (main_mem_wdata),
-// ... other AXI signals ...
-
-// UART
-.uart_rx      (uart_io_SIN),  // Connect to USB-UART RX
-.uart_tx      (uart_io_SOUT), // Connect to USB-UART TX
+For more details on any component, refer to the Verilog code or contact the maintainers.
 ```
 
 ---

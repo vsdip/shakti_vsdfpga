@@ -107,10 +107,7 @@ This differs from a **modular design**, where components like `clint` or `uart` 
    - `mv_end_simulation` is useful in testbenches to terminate simulations automatically.
    - Use `io_dump_get` to debug system state (registers, FIFOs, etc.).
 
----
 
-For more details on any component, refer to the Verilog code or contact the maintainers.
-```
 
 ---
 For more details on any component, refer to the Verilog codes in **"verilog"** folder or contact the maintainers.

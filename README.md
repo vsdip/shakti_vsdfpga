@@ -53,8 +53,6 @@ This SoC is designed for embedded systems and includes a CPU core, memory interf
 
 ---
 
-For more details on any component, refer to the Verilog code or contact the maintainers.
+For more details on any component, refer to the Verilog codes in **"verilog"** folder or contact the maintainers.
 
----
 
-You can now use this `README.md` in your GitHub repository to provide a clear and concise overview of the SoC components. Let me know if you need further assistance! 😊

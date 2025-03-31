@@ -3,7 +3,7 @@
 Repo for shakti files
 ![image](https://github.com/user-attachments/assets/17d5aa33-fef9-4f01-aa01-206d655aa4ec)
 
-# Shakti SoC Details:
+# Shakti eclass 64-bit SoC Details:
 Here’s the updated **GitHub `README.md`** with the **I/O Signals Table** added to the **Table of Contents**:
 
 ---

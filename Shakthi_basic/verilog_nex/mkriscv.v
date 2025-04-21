@@ -1090,4 +1090,3 @@ module mkriscv(resetpc,
   assign stage3_EN_ext_interrupt = EN_ext_interrupt ;
   assign stage3_EN_dump_get = EN_dump_get ;
 endmodule  // mkriscv
-

@@ -558,57 +558,6 @@ module mkeclass_axi4lite(resetpc,
   wire [33 : 0] MUX_riscv_memory_response_put_1__VAL_1,
 		MUX_riscv_memory_response_put_1__VAL_2;
 
-  // declarations used by system tasks
-  // synopsys translate_off
-  reg TASK_testplusargs___d17;
-  reg TASK_testplusargs___d18;
-  reg TASK_testplusargs___d19;
-  reg [63 : 0] v__h1953;
-  reg TASK_testplusargs___d46;
-  reg TASK_testplusargs___d47;
-  reg TASK_testplusargs___d48;
-  reg [63 : 0] v__h2321;
-  reg TASK_testplusargs___d66;
-  reg TASK_testplusargs___d67;
-  reg TASK_testplusargs___d68;
-  reg [63 : 0] v__h2501;
-  reg TASK_testplusargs___d111;
-  reg TASK_testplusargs___d112;
-  reg TASK_testplusargs___d113;
-  reg [63 : 0] v__h4217;
-  reg TASK_testplusargs___d119;
-  reg TASK_testplusargs___d120;
-  reg TASK_testplusargs___d121;
-  reg [63 : 0] v__h4366;
-  reg TASK_testplusargs___d129;
-  reg TASK_testplusargs___d130;
-  reg TASK_testplusargs___d131;
-  reg [63 : 0] v__h2852;
-  reg TASK_testplusargs___d172;
-  reg TASK_testplusargs___d173;
-  reg TASK_testplusargs___d174;
-  reg [63 : 0] v__h4994;
-  reg TASK_testplusargs___d197;
-  reg TASK_testplusargs___d198;
-  reg TASK_testplusargs___d199;
-  reg [63 : 0] v__h5267;
-  reg riscv_memory_request_get_2_BITS_5_TO_4_5_EQ_1__ETC___d116;
-  reg riscv_memory_request_get_2_BITS_5_TO_4_5_EQ_1__ETC___d124;
-  reg NOT_riscv_memory_request_get_2_BITS_5_TO_4_5_E_ETC___d134;
-  reg TASK_testplusargs_6_OR_TASK_testplusargs_7_AND_ETC___d52;
-  reg TASK_testplusargs_6_OR_TASK_testplusargs_7_AND_ETC___d54;
-  reg TASK_testplusargs_6_OR_TASK_testplusargs_7_AND_ETC___d56;
-  reg TASK_testplusargs_6_OR_TASK_testplusargs_7_AND_ETC___d61;
-  reg TASK_testplusargs_72_OR_TASK_testplusargs_73_A_ETC___d178;
-  reg TASK_testplusargs_72_OR_TASK_testplusargs_73_A_ETC___d180;
-  reg TASK_testplusargs_72_OR_TASK_testplusargs_73_A_ETC___d182;
-  reg TASK_testplusargs_72_OR_TASK_testplusargs_73_A_ETC___d187;
-  reg TASK_testplusargs_97_OR_TASK_testplusargs_98_A_ETC___d203;
-  reg TASK_testplusargs_97_OR_TASK_testplusargs_98_A_ETC___d205;
-  reg TASK_testplusargs_97_OR_TASK_testplusargs_98_A_ETC___d207;
-  reg TASK_testplusargs_97_OR_TASK_testplusargs_98_A_ETC___d212;
-  // synopsys translate_on
-
   // remaining internal signals
   reg [31 : 0] CASE_ff_mem_requestD_OUT_BITS_2_TO_1_0_IF_ff__ETC__q3,
 	       w_wdata__h3027;
@@ -925,40 +874,28 @@ module mkeclass_axi4lite(resetpc,
 								 .EMPTY_N(memory_xactor_f_wr_resp_EMPTY_N));
 
   // submodule riscv
-  mkriscv riscv(.resetpc(resetpc),
-		.CLK(CLK),
-		.RST_N(RST_N),
-		.clint_msip_intrpt(riscv_clint_msip_intrpt),
-		.clint_mtime_c_mtime(riscv_clint_mtime_c_mtime),
-		.clint_mtip_intrpt(riscv_clint_mtip_intrpt),
-		.ext_interrupt_intrpt(riscv_ext_interrupt_intrpt),
-		.inst_response_put(riscv_inst_response_put),
-		.memory_response_put(riscv_memory_response_put),
-		.EN_inst_request_get(riscv_EN_inst_request_get),
-		.EN_inst_response_put(riscv_EN_inst_response_put),
-		.EN_memory_request_get(riscv_EN_memory_request_get),
-		.EN_memory_response_put(riscv_EN_memory_response_put),
-		.EN_clint_msip(riscv_EN_clint_msip),
-		.EN_clint_mtip(riscv_EN_clint_mtip),
-		.EN_clint_mtime(riscv_EN_clint_mtime),
-		.EN_ext_interrupt(riscv_EN_ext_interrupt),
-		.EN_dump_get(riscv_EN_dump_get),
-		.inst_request_get(riscv_inst_request_get),
-		.RDY_inst_request_get(riscv_RDY_inst_request_get),
-		.RDY_inst_response_put(riscv_RDY_inst_response_put),
-		.memory_request_get(riscv_memory_request_get),
-		.RDY_memory_request_get(riscv_RDY_memory_request_get),
-		.RDY_memory_response_put(),
-		.RDY_clint_msip(),
-		.RDY_clint_mtip(),
-		.RDY_clint_mtime(),
-		.RDY_ext_interrupt(),
-		.dump_get(riscv_dump_get),
-		.RDY_dump_get(riscv_RDY_dump_get),
-		.mv_curr_priv(riscv_mv_curr_priv),
-		.RDY_mv_curr_priv(),
-		.mv_trap(riscv_mv_trap),
-		.RDY_mv_trap());
+mkriscv riscv (
+    .resetpc(resetpc),
+    .CLK(CLK),
+    .RST_N(RST_N),
+
+    // Core instruction and memory interfaces
+    .inst_request_get(riscv_inst_request_get),
+    .RDY_inst_request_get(riscv_RDY_inst_request_get),
+    .EN_inst_request_get(riscv_EN_inst_request_get),
+
+    .inst_response_put(riscv_inst_response_put),
+    .RDY_inst_response_put(riscv_RDY_inst_response_put),
+    .EN_inst_response_put(riscv_EN_inst_response_put),
+
+    .memory_request_get(riscv_memory_request_get),
+    .RDY_memory_request_get(riscv_RDY_memory_request_get),
+    .EN_memory_request_get(riscv_EN_memory_request_get),
+
+    .memory_response_put(riscv_memory_response_put),
+    .EN_memory_response_put(riscv_EN_memory_response_put)
+);
+
 
   // rule RL_update_epochs
   assign CAN_FIRE_RL_update_epochs = riscv_mv_trap ;

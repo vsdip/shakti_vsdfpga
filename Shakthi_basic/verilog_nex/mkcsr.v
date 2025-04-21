@@ -127,9 +127,6 @@ module mkcsr(
     // .mv_curr_priv(csrfile_mv_curr_priv),
     // .RDY_mv_curr_priv(),
     .csr_mstatus(csrfile_csr_mstatus),
-    .RDY_csr_mstatus(),
-    .RDY_clint_msip(),
-    .RDY_clint_mtip(),
     // .RDY_clint_mtime(),
     .RDY_ext_interrupt(),
     .mv_interrupt(csrfile_mv_interrupt)

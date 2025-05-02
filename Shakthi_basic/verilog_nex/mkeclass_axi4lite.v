@@ -180,11 +180,7 @@ module mkeclass_axi4lite(resetpc,
 
 			 sb_ext_interrupt_put,
 			 EN_sb_ext_interrupt_put,
-			 RDY_sb_ext_interrupt_put,
-
-			 EN_io_dump_get,
-			 io_dump_get,
-			 RDY_io_dump_get);
+			 RDY_sb_ext_interrupt_put);
   input  [31 : 0] resetpc;
   input  CLK;
   input  RST_N;
@@ -331,10 +327,6 @@ module mkeclass_axi4lite(resetpc,
   input  EN_sb_ext_interrupt_put;
   output RDY_sb_ext_interrupt_put;
 
-  // actionvalue method io_dump_get
-  input  EN_io_dump_get;
-  output [102 : 0] io_dump_get;
-  output RDY_io_dump_get;
 
   // signals for module outputs
   wire [102 : 0] io_dump_get;

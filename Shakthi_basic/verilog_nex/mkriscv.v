@@ -79,25 +79,8 @@ module mkriscv(resetpc,
 	       EN_memory_response_put,
 	       RDY_memory_response_put,
 
-	       clint_msip_intrpt,
-	       EN_clint_msip,
-	       RDY_clint_msip,
 
-	       clint_mtip_intrpt,
-	       EN_clint_mtip,
-	       RDY_clint_mtip,
 
-	       clint_mtime_c_mtime,
-	       EN_clint_mtime,
-	       RDY_clint_mtime,
-
-	       ext_interrupt_intrpt,
-	       EN_ext_interrupt,
-	       RDY_ext_interrupt,
-
-	       EN_dump_get,
-	       dump_get,
-	       RDY_dump_get,
 
 	       mv_curr_priv,
 	       RDY_mv_curr_priv,
@@ -128,30 +111,8 @@ module mkriscv(resetpc,
   input  EN_memory_response_put;
   output RDY_memory_response_put;
 
-  // action method clint_msip
-  input  clint_msip_intrpt;
-  input  EN_clint_msip;
-  output RDY_clint_msip;
 
-  // action method clint_mtip
-  input  clint_mtip_intrpt;
-  input  EN_clint_mtip;
-  output RDY_clint_mtip;
 
-  // action method clint_mtime
-  input  [63 : 0] clint_mtime_c_mtime;
-  input  EN_clint_mtime;
-  output RDY_clint_mtime;
-
-  // action method ext_interrupt
-  input  ext_interrupt_intrpt;
-  input  EN_ext_interrupt;
-  output RDY_ext_interrupt;
-
-  // actionvalue method dump_get
-  input  EN_dump_get;
-  output [102 : 0] dump_get;
-  output RDY_dump_get;
 
   // value method mv_curr_priv
   output [1 : 0] mv_curr_priv;

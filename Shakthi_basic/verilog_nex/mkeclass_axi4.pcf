@@ -1,0 +1,9 @@
+set_io RESET 13     # Active-high reset button
+
+# UART TX
+set_io TXD   14     # UART TX output to USB/serial
+
+# LEDs (assuming 3 onboard LEDs are connected to these pins)
+set_io LEDS[0] 38
+set_io LEDS[1] 39
+set_io LEDS[2] 40

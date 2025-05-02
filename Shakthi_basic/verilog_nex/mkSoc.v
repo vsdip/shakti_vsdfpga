@@ -158,7 +158,6 @@ module mkSoc(
   output uart_io_SOUT;
 
   // signals for module outputs
-  wire [102 : 0] io_dump_get;
   wire [31 : 0] boot_mem_master_ARADDR,
 		boot_mem_master_AWADDR,
 		boot_mem_master_WDATA,

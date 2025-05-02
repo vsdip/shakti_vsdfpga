@@ -67,7 +67,13 @@
   `define BSV_RESET_VALUE 1'b0
   `define BSV_RESET_EDGE negedge
 `endif
-
+//
+// Simplified CSR File (RV32I-only, minimal features)
+// - Removed MISA, MSCRATCH, MTIME, privilege levels
+// - Simplified MSTATUS/MIE/MIP to single-bit
+// - Fixed MTVEC address (0x0)
+// - Basic trap/interrupt handling
+//
 module mkcsrfile(CLK,
      RST_N,
 
@@ -78,7 +84,6 @@ module mkcsrfile(CLK,
 
      write_csr_addr,
      write_csr_word,
-     write_csr_lpc,
      EN_write_csr,
      RDY_write_csr,
 
@@ -88,262 +93,100 @@ module mkcsrfile(CLK,
 
      upd_on_trap_cause,
      upd_on_trap_pc,
-     upd_on_trap_tval,
      EN_upd_on_trap,
      upd_on_trap,
      RDY_upd_on_trap,
 
-     // EN_incr_minstret, // Removed minstret
-     // RDY_incr_minstret,
-
-     // mv_csr_decode, // Removed mv_csr_decode
-     // RDY_mv_csr_decode,
-
-     mv_csr_misa_c,
-     RDY_mv_csr_misa_c,
-
-     // mv_curr_priv, // Removed privilege levels
-     // RDY_mv_curr_priv,
-
-     csr_mstatus,
-     RDY_csr_mstatus,
-
-     clint_msip_intrpt,
-     EN_clint_msip,
-     RDY_clint_msip,
-
-     clint_mtip_intrpt,
-     EN_clint_mtip,
-     RDY_clint_mtip,
-
-     // clint_mtime_c_mtime, // Removed mtime access for simplicity
-     // EN_clint_mtime,
-     // RDY_clint_mtime,
-
      ext_interrupt_ex_i,
      EN_ext_interrupt,
      RDY_ext_interrupt,
-
+     csr_mstatus,
      mv_interrupt);
+
   input  CLK;
   input  RST_N;
 
-  // actionvalue method read_csr
+  // CSR access ports
   input  [11 : 0] read_csr_addr;
   input  EN_read_csr;
   output [31 : 0] read_csr;
   output RDY_read_csr;
 
-  // action method write_csr
   input  [11 : 0] write_csr_addr;
   input  [31 : 0] write_csr_word;
-  input  [1 : 0] write_csr_lpc;
   input  EN_write_csr;
   output RDY_write_csr;
 
-  // actionvalue method upd_on_ret
+  // Trap handling
   input  EN_upd_on_ret;
   output [31 : 0] upd_on_ret;
   output RDY_upd_on_ret;
 
-  // actionvalue method upd_on_trap
   input  [5 : 0] upd_on_trap_cause;
   input  [31 : 0] upd_on_trap_pc;
-  input  [31 : 0] upd_on_trap_tval;
   input  EN_upd_on_trap;
   output [31 : 0] upd_on_trap;
   output RDY_upd_on_trap;
 
-  // action method clint_msip
-  input  clint_msip_intrpt;
-  input  EN_clint_msip;
-  output RDY_clint_msip;
-
-  // action method clint_mtip
-  input  clint_mtip_intrpt;
-  input  EN_clint_mtip;
-  output RDY_clint_mtip;
-
-  // action method ext_interrupt
+  // Interrupts
   input  ext_interrupt_ex_i;
   input  EN_ext_interrupt;
   output RDY_ext_interrupt;
-
-  // value method mv_interrupt
   output mv_interrupt;
+  output [31:0] csr_mstatus;
 
-  // value method mv_csr_misa_c
-  output mv_csr_misa_c;
-  output RDY_mv_csr_misa_c;
+  // Internal registers
+  reg [3 : 0]  rg_mcause;    // 4-bit cause (supports 16 exceptions)
+  reg [31 : 0] rg_mepc;      // Full 32-bit PC (no alignment bit)
+  reg          rg_mie;       // Single-bit global interrupt enable
+  reg          rg_mip;       // Single-bit interrupt pending
 
-  // value method csr_mstatus
-  output [31 : 0] csr_mstatus;
-  output RDY_csr_mstatus;
+  // Fixed MTVEC address (hardcoded to 0x0)
+  assign upd_on_trap = 32'h00000000;
 
-  // signals for module outputs
-  reg [31 : 0] read_csr;
-  wire [31 : 0] csr_mstatus, upd_on_ret, upd_on_trap;
-  wire RDY_clint_msip,
-       RDY_clint_mtip,
-       RDY_csr_mstatus,
-       RDY_ext_interrupt,
-       RDY_read_csr,
-       RDY_upd_on_ret,
-       RDY_upd_on_trap,
-       RDY_write_csr,
-       mv_csr_misa_c,
-       mv_interrupt;
+  // CSR read logic
+  assign read_csr = 
+    (read_csr_addr == 12'h300) ? {31'd0, rg_mie} : // MSTATUS
+    (read_csr_addr == 12'h341) ? rg_mepc :         // MEPC
+    (read_csr_addr == 12'h342) ? {28'd0, rg_mcause} : // MCAUSE
+    32'd0;
 
-  // register misa_i (assuming basic RV32I)
-  reg misa_i;
-  wire misa_i_D_IN, misa_i_EN;
+  assign RDY_read_csr = 1'b1;
 
-  // register rg_mcause
-  reg [4 : 0] rg_mcause;
-  wire [4 : 0] rg_mcause_D_IN;
-  wire rg_mcause_EN;
+  // CSR write logic (only MSTATUS/MEPC supported)
+  always @(posedge CLK or negedge RST_N) begin
+    if (!RST_N) begin
+      rg_mie   <= 1'b0;
+      rg_mepc  <= 32'd0;
+      rg_mcause <= 4'd0;
+      rg_mip   <= 1'b0;
+    end else begin
+      if (EN_write_csr) begin
+        case (write_csr_addr)
+          12'h300: rg_mie <= write_csr_word[0]; // MSTATUS[0] = MIE
+          12'h341: rg_mepc <= write_csr_word;   // MEPC
+          12'h342: rg_mcause <= write_csr_word[3:0]; // MCAUSE
+        endcase
+      end
 
-  // register rg_mepc
-  reg [30 : 0] rg_mepc;
-  wire [30 : 0] rg_mepc_D_IN;
-  wire rg_mepc_EN;
-
-  // register rg_mie (Machine Interrupt Enable) - simplified
-  reg rg_mie;
-  wire rg_mie_D_IN, rg_mie_EN;
-
-  // register rg_mip (Machine Interrupt Pending) - simplified
-  reg rg_mip;
-  wire rg_mip_D_IN, rg_mip_EN;
-
-  // register rg_mtvec (Machine Trap Vector)
-  reg [29 : 0] rg_mtvec;
-  wire [29 : 0] rg_mtvec_D_IN;
-  wire rg_mtvec_EN;
-
-  // register rg_mscratch
-  reg [31 : 0] rg_mscratch;
-  wire [31 : 0] rg_mscratch_D_IN;
-  wire rg_mscratch_EN;
-
-  // rule scheduling signals (removed unused)
-  wire CAN_FIRE_read_csr, WILL_FIRE_read_csr;
-  wire CAN_FIRE_write_csr, WILL_FIRE_write_csr;
-  wire CAN_FIRE_upd_on_ret, WILL_FIRE_upd_on_ret;
-  wire CAN_FIRE_upd_on_trap, WILL_FIRE_upd_on_trap;
-  wire CAN_FIRE_clint_msip, WILL_FIRE_clint_msip;
-  wire CAN_FIRE_clint_mtip, WILL_FIRE_clint_mtip;
-  wire CAN_FIRE_ext_interrupt, WILL_FIRE_ext_interrupt;
-
-  // actionvalue method read_csr
-  always@(read_csr_addr or rg_mscratch or misa_i or rg_mtvec or rg_mcause or rg_mepc or rg_mie or rg_mip)
-  begin
-    case (read_csr_addr)
-      12'h301: read_csr = { 23'd2097664, misa_i, 8'd0 }; // MISA
-      12'h305: read_csr = { rg_mtvec, 2'b00 };           // MTVEC
-      12'h340: read_csr = rg_mscratch;                   // MSCRATCH
-      12'h341: read_csr = { rg_mepc, 1'b0 };             // MEPC
-      12'h342: read_csr = { 27'd0, rg_mcause };          // MCAUSE
-      12'h300: read_csr = { 24'd0, 3'd0, 1'b0, 2'd0, 2'b0, 2'd0, rg_mie, 2'd0, 1'b0 }; // MSTATUS (simplified)
-      12'h304: read_csr = { 27'd0, 3'd0, rg_mip };      // MIP (simplified)
-      default: read_csr = 32'd0;
-    endcase
+      // Interrupt pending (simple OR)
+      if (EN_ext_interrupt) begin
+        rg_mip <= ext_interrupt_ex_i;
+      end
+    end
   end
-  assign RDY_read_csr = 1'd1 ;
-  assign CAN_FIRE_read_csr = 1'd1 ;
-  assign WILL_FIRE_read_csr = EN_read_csr ;
 
-  // action method write_csr
-  assign RDY_write_csr = 1'd1 ;
-  assign CAN_FIRE_write_csr = 1'd1 ;
-  assign WILL_FIRE_write_csr = EN_write_csr ;
+  // Trap handling
+  assign upd_on_ret = rg_mepc;
+  assign RDY_upd_on_ret = 1'b1;
+  assign RDY_upd_on_trap = 1'b1;
 
-  // actionvalue method upd_on_ret
-  assign upd_on_ret = { rg_mepc, 1'b0 } ;
-  assign RDY_upd_on_ret = 1'd1 ;
-  assign CAN_FIRE_upd_on_ret = 1'd1 ;
-  assign WILL_FIRE_upd_on_ret = EN_upd_on_ret ;
+  // Interrupt generation
+  assign mv_interrupt = rg_mip & rg_mie;
 
-  // actionvalue method upd_on_trap
-  assign upd_on_trap = { rg_mtvec, 2'b00 }; // Basic redirection
-  assign RDY_upd_on_trap = 1'd1 ;
-  assign CAN_FIRE_upd_on_trap = 1'd1 ;
-  assign WILL_FIRE_upd_on_trap = EN_upd_on_trap ;
-
-  // action method clint_msip
-  assign RDY_clint_msip = 1'd1 ;
-  assign CAN_FIRE_clint_msip = 1'd1 ;
-  assign WILL_FIRE_clint_msip = EN_clint_msip ;
-
-  // action method clint_mtip
-  assign RDY_clint_mtip = 1'd1 ;
-  assign CAN_FIRE_clint_mtip = 1'd1 ;
-  assign WILL_FIRE_clint_mtip = EN_clint_mtip ;
-
-  // action method ext_interrupt
-  assign RDY_ext_interrupt = 1'd1 ;
-  assign CAN_FIRE_ext_interrupt = 1'd1 ;
-  assign WILL_FIRE_ext_interrupt = EN_ext_interrupt ;
-
-  // value method mv_interrupt
-  assign mv_interrupt = rg_mip[0] | rg_mip[1]; // Example: check MSIP and MTIP
-
-  // value method mv_csr_misa_c
-  assign mv_csr_misa_c = 1'd0 ;
-  assign RDY_mv_csr_misa_c = 1'd1 ;
-
-  // value method csr_mstatus (very simplified)
-  assign csr_mstatus = { 24'd0, 3'd0, 1'b0, 2'd0, 2'b0, 2'd0, rg_mie, 2'd0, 1'b0 };
-  assign RDY_csr_mstatus = 1'd1 ;
-
-  // register misa_i (assuming RV32I)
-  assign misa_i_D_IN = write_csr_word[8] ;
-  assign misa_i_EN = EN_write_csr && write_csr_addr == 12'h301 ;
-
-  // register rg_mcause
-  assign rg_mcause_D_IN = upd_on_trap_cause[4:0] ;
-  assign rg_mcause_EN = EN_upd_on_trap ;
-
-  // register rg_mepc
-  assign rg_mepc_D_IN = upd_on_trap_pc[31:1] ;
-  assign rg_mepc_EN = EN_upd_on_trap ;
-
-  // register rg_mie (simplified - only Machine External and Timer)
-  assign rg_mie_D_IN = write_csr_word[3] | write_csr_word[7];
-  assign rg_mie_EN = EN_write_csr && write_csr_addr == 12'h300;
-
-  // register rg_mip (simplified - only Machine External and Timer)
-  assign rg_mip_D_IN = (ext_interrupt_ex_i & rg_mie[0]) | (clint_mtip_intrpt & rg_mie[1]) | (clint_msip_intrpt & rg_mie[2]);
-  assign rg_mip_EN = EN_ext_interrupt | EN_clint_mtip | EN_clint_msip;
-
-  // register rg_mtvec
-  assign rg_mtvec_D_IN = write_csr_word[31:2] ;
-  assign rg_mtvec_EN = EN_write_csr && write_csr_addr == 12'h305 ;
-
-  // register rg_mscratch
-  assign rg_mscratch_D_IN = write_csr_word ;
-  assign rg_mscratch_EN = EN_write_csr && write_csr_addr == 12'h340 ;
-
-  always@(posedge CLK or `BSV_RESET_EDGE RST_N)
-  if (RST_N == `BSV_RESET_VALUE)
-    begin
-      misa_i <= `BSV_ASSIGNMENT_DELAY 1'd1; // Assuming RV32I
-      rg_mcause <= `BSV_ASSIGNMENT_DELAY 5'd0;
-      rg_mepc <= `BSV_ASSIGNMENT_DELAY 31'd0;
-      rg_mie <= `BSV_ASSIGNMENT_DELAY 1'd0;
-      rg_mip <= `BSV_ASSIGNMENT_DELAY 1'd0;
-      rg_mtvec <= `BSV_ASSIGNMENT_DELAY 30'd0;
-      rg_mscratch <= `BSV_ASSIGNMENT_DELAY 32'd0;
-    end
-  else
-    begin
-      if (misa_i_EN) misa_i <= `BSV_ASSIGNMENT_DELAY misa_i_D_IN;
-      if (rg_mcause_EN) rg_mcause <= `BSV_ASSIGNMENT_DELAY rg_mcause_D_IN;
-      if (rg_mepc_EN) rg_mepc <= `BSV_ASSIGNMENT_DELAY rg_mepc_D_IN;
-      if (rg_mie_EN) rg_mie <= `BSV_ASSIGNMENT_DELAY rg_mie_D_IN;
-      if (rg_mip_EN) rg_mip <= `BSV_ASSIGNMENT_DELAY rg_mip_D_IN;
-      if (rg_mtvec_EN) rg_mtvec <= `BSV_ASSIGNMENT_DELAY rg_mtvec_D_IN;
-      if (rg_mscratch_EN) rg_mscratch <= `BSV_ASSIGNMENT_DELAY rg_mscratch_D_IN;
-    end
+  // Unused feature tie-offs
+  assign RDY_write_csr = 1'b1;
+  assign RDY_ext_interrupt = 1'b1;
+  assign csr_mstatus = {31'd0, rg_mie};
 
 endmodule

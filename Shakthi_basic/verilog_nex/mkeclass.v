@@ -223,26 +223,9 @@ module mkeclass(CLK,
 		master_i_RID,
 
 		master_i_RREADY,
-
-		sb_clint_msip_put,
-		EN_sb_clint_msip_put,
-		RDY_sb_clint_msip_put,
-
-		sb_clint_mtip_put,
-		EN_sb_clint_mtip_put,
-		RDY_sb_clint_mtip_put,
-
-		sb_clint_mtime_put,
-		EN_sb_clint_mtime_put,
-		RDY_sb_clint_mtime_put,
-
 		sb_ext_interrupt_put,
 		EN_sb_ext_interrupt_put,
-		RDY_sb_ext_interrupt_put,
-
-		EN_io_dump_get,
-		io_dump_get,
-		RDY_io_dump_get);
+		RDY_sb_ext_interrupt_put);
   input  CLK;
   input  RST_N;
 
@@ -422,20 +405,7 @@ module mkeclass(CLK,
   // value method master_i_m_rready
   output master_i_RREADY;
 
-  // action method sb_clint_msip_put
-  input  sb_clint_msip_put;
-  input  EN_sb_clint_msip_put;
-  output RDY_sb_clint_msip_put;
 
-  // action method sb_clint_mtip_put
-  input  sb_clint_mtip_put;
-  input  EN_sb_clint_mtip_put;
-  output RDY_sb_clint_mtip_put;
-
-  // action method sb_clint_mtime_put
-  input  [63 : 0] sb_clint_mtime_put;
-  input  EN_sb_clint_mtime_put;
-  output RDY_sb_clint_mtime_put;
 
   // action method sb_ext_interrupt_put
   input  sb_ext_interrupt_put;
@@ -443,9 +413,6 @@ module mkeclass(CLK,
   output RDY_sb_ext_interrupt_put;
 
   // actionvalue method io_dump_get
-  input  EN_io_dump_get;
-  output [102 : 0] io_dump_get;
-  output RDY_io_dump_get;
 
   // signals for module outputs
   wire [102 : 0] io_dump_get;
@@ -890,8 +857,6 @@ module mkeclass(CLK,
   assign WILL_FIRE_sb_ext_interrupt_put = EN_sb_ext_interrupt_put ;
 
   // actionvalue method io_dump_get
-  assign io_dump_get = riscv_dump_get ;
-  assign RDY_io_dump_get = riscv_RDY_dump_get ;
   assign CAN_FIRE_io_dump_get = riscv_RDY_dump_get ;
   assign WILL_FIRE_io_dump_get = EN_io_dump_get ;
 

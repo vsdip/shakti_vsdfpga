@@ -35,7 +35,7 @@ module BRAM1Load(CLK,
                  DO
                  );
 
-   parameter                      FILENAME   = "boot.hex";
+   parameter                      FILENAME   = "firmware.hex";
    parameter                      PIPELINED  = 0;
    parameter                      ADDR_WIDTH = 1;
    parameter                      DATA_WIDTH = 1;

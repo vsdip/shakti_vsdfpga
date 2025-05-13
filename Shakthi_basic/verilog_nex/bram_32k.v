@@ -1,7 +1,7 @@
 // Read-only BRAM using BRAM-style hint
 module bram_32k_read #(
     parameter ADDR_WIDTH = 15,
-    parameter INIT_FILE = "boot.hex"
+    parameter INIT_FILE = "firmware.hex"
 )(
     input                         clk,
     input                         arvalid,

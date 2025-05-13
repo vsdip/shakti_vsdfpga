@@ -19,7 +19,7 @@ module RegFileLoad(CLK,
                    ADDR_4, D_OUT_4,
                    ADDR_5, D_OUT_5
                    );
-   parameter                   file = "boot.hex";
+   parameter                   file = "firmware.hex";
    parameter                   addr_width = 1;
    parameter                   data_width = 1;
    parameter                   lo = 0;

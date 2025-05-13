@@ -12,89 +12,45 @@
 
 
 // Multi-ported Register File
-module RegFile(CLK,
-               ADDR_IN, D_IN, WE,
-               ADDR_1, D_OUT_1,
-               ADDR_2, D_OUT_2,
-               ADDR_3, D_OUT_3,
-               ADDR_4, D_OUT_4,
-               ADDR_5, D_OUT_5
-               );
-   parameter                   addr_width = 1;
-   parameter                   data_width = 1;
-   parameter                   lo = 0;
-   parameter                   hi = 1;
+module RegFile #(
+    parameter addr_width = 5,  // Default: 5-bit address (0-31)
+    parameter data_width = 32, // Default: 32-bit data
+    parameter lo = 0,          // Default: lowest address
+    parameter hi = 31          // Default: highest address
+)(
+    input               CLK,
+    input [4:0]         ADDR_IN,    // 5-bit address (0-31)
+    input [31:0]        D_IN,       // 32-bit data
+    input               WE,         // Write enable
 
-   input                       CLK;
-   input [addr_width - 1 : 0]  ADDR_IN;
-   input [data_width - 1 : 0]  D_IN;
-   input                       WE;
+    // Only 2 active read ports (others unused)
+    input [4:0]         ADDR_1,
+    output [31:0]       D_OUT_1,
+    input [4:0]         ADDR_2,
+    output [31:0]       D_OUT_2,
 
-   input [addr_width - 1 : 0]  ADDR_1;
-   output [data_width - 1 : 0] D_OUT_1;
+    // Unused ports (kept for compatibility but optimized away)
+    input [4:0]         ADDR_3,
+    output [31:0]       D_OUT_3,
+    input [4:0]         ADDR_4,
+    output [31:0]       D_OUT_4,
+    input [4:0]         ADDR_5,
+    output [31:0]       D_OUT_5
+);
+    // Force BRAM inference (if array is large enough)
+    reg [31:0] reg_file [0:31];  // 32 entries x 32-bit
 
-   input [addr_width - 1 : 0]  ADDR_2;
-   output [data_width - 1 : 0] D_OUT_2;
+    // Write logic
+    always @(posedge CLK) begin
+        if (WE) reg_file[ADDR_IN] <= D_IN;
+    end
 
-   input [addr_width - 1 : 0]  ADDR_3;
-   output [data_width - 1 : 0] D_OUT_3;
+    // Active read ports
+    assign D_OUT_1 = reg_file[ADDR_1];
+    assign D_OUT_2 = reg_file[ADDR_2];
 
-   input [addr_width - 1 : 0]  ADDR_4;
-   output [data_width - 1 : 0] D_OUT_4;
-
-   input [addr_width - 1 : 0]  ADDR_5;
-   output [data_width - 1 : 0] D_OUT_5;
-
-   reg [data_width - 1 : 0]    arr[lo:hi];
-
-
-`ifdef BSV_NO_INITIAL_BLOCKS
-`else // not BSV_NO_INITIAL_BLOCKS
-   // synopsys translate_off
-   initial
-     begin : init_block
-        integer                     i; 		// temporary for generate reset value
-        for (i = lo; i <= hi; i = i + 1) begin
-           arr[i] = {((data_width + 1)/2){2'b10}} ;
-        end
-     end // initial begin
-   // synopsys translate_on
-`endif // BSV_NO_INITIAL_BLOCKS
-
-
-   always@(posedge CLK)
-     begin
-        if (WE)
-          arr[ADDR_IN] <= `BSV_ASSIGNMENT_DELAY D_IN;
-     end // always@ (posedge CLK)
-
-   assign D_OUT_1 = arr[ADDR_1];
-   assign D_OUT_2 = arr[ADDR_2];
-   assign D_OUT_3 = arr[ADDR_3];
-   assign D_OUT_4 = arr[ADDR_4];
-   assign D_OUT_5 = arr[ADDR_5];
-
-   // synopsys translate_off
-   always@(posedge CLK)
-     begin : runtime_check
-        reg enable_check;
-        enable_check = `BSV_WARN_REGFILE_ADDR_RANGE ;
-        if ( enable_check )
-           begin
-              if (( ADDR_1 < lo ) || (ADDR_1 > hi) )
-                $display( "Warning: RegFile: %m -- Address port 1 is out of bounds: %h", ADDR_1 ) ;
-              if (( ADDR_2 < lo ) || (ADDR_2 > hi) )
-                $display( "Warning: RegFile: %m -- Address port 2 is out of bounds: %h", ADDR_2 ) ;
-              if (( ADDR_3 < lo ) || (ADDR_3 > hi) )
-                $display( "Warning: RegFile: %m -- Address port 3 is out of bounds: %h", ADDR_3 ) ;
-              if (( ADDR_4 < lo ) || (ADDR_4 > hi) )
-                $display( "Warning: RegFile: %m -- Address port 4 is out of bounds: %h", ADDR_4 ) ;
-              if (( ADDR_5 < lo ) || (ADDR_5 > hi) )
-                $display( "Warning: RegFile: %m -- Address port 5 is out of bounds: %h", ADDR_5 ) ;
-              if ( WE && ( ADDR_IN < lo ) || (ADDR_IN > hi) )
-                $display( "Warning: RegFile: %m -- Write Address port is out of bounds: %h", ADDR_IN ) ;
-           end
-     end
-   // synopsys translate_on
-
+    // Unused read ports (tied to 0 to avoid synthesis warnings)
+    assign D_OUT_3 = 32'b0;
+    assign D_OUT_4 = 32'b0;
+    assign D_OUT_5 = 32'b0;
 endmodule

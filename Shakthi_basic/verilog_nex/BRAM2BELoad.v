@@ -19,7 +19,7 @@ module BRAM2BELoad(CLKA,
                    DOB
                   );
 
-   parameter                      FILENAME   = "boot.hex";
+   parameter                      FILENAME   = "firmware.hex";
    parameter                      PIPELINED  = 0;
    parameter                      ADDR_WIDTH = 1;
    parameter                      DATA_WIDTH = 1;

@@ -1,0 +1,16 @@
+# Yosys synthesis script for mkeclass_axi4 (Shakti E-Class Top)
+
+# Step 1: Read all Bluespec-generated Verilog files
+read_verilog verilog/*.v
+
+# Step 2: Define top module
+hierarchy -check -top mkeclass_axi4
+
+# Step 3: Do design checks
+proc; opt; memory; opt; flatten
+
+# Step 4: Synthesize for iCE40 FPGA (change if needed)
+synth_ice40 -top mkeclass_axi4 -json mkeclass_axi4.json
+
+# Step 5: Report stats
+stat

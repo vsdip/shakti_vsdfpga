@@ -223,26 +223,9 @@ module mkeclass(CLK,
 		master_i_RID,
 
 		master_i_RREADY,
-
-		sb_clint_msip_put,
-		EN_sb_clint_msip_put,
-		RDY_sb_clint_msip_put,
-
-		sb_clint_mtip_put,
-		EN_sb_clint_mtip_put,
-		RDY_sb_clint_mtip_put,
-
-		sb_clint_mtime_put,
-		EN_sb_clint_mtime_put,
-		RDY_sb_clint_mtime_put,
-
 		sb_ext_interrupt_put,
 		EN_sb_ext_interrupt_put,
-		RDY_sb_ext_interrupt_put,
-
-		EN_io_dump_get,
-		io_dump_get,
-		RDY_io_dump_get);
+		RDY_sb_ext_interrupt_put);
   input  CLK;
   input  RST_N;
 
@@ -422,20 +405,7 @@ module mkeclass(CLK,
   // value method master_i_m_rready
   output master_i_RREADY;
 
-  // action method sb_clint_msip_put
-  input  sb_clint_msip_put;
-  input  EN_sb_clint_msip_put;
-  output RDY_sb_clint_msip_put;
 
-  // action method sb_clint_mtip_put
-  input  sb_clint_mtip_put;
-  input  EN_sb_clint_mtip_put;
-  output RDY_sb_clint_mtip_put;
-
-  // action method sb_clint_mtime_put
-  input  [63 : 0] sb_clint_mtime_put;
-  input  EN_sb_clint_mtime_put;
-  output RDY_sb_clint_mtime_put;
 
   // action method sb_ext_interrupt_put
   input  sb_ext_interrupt_put;
@@ -443,9 +413,6 @@ module mkeclass(CLK,
   output RDY_sb_ext_interrupt_put;
 
   // actionvalue method io_dump_get
-  input  EN_io_dump_get;
-  output [102 : 0] io_dump_get;
-  output RDY_io_dump_get;
 
   // signals for module outputs
   wire [102 : 0] io_dump_get;
@@ -686,61 +653,6 @@ module mkeclass(CLK,
   wire [33 : 0] MUX_riscv_memory_response_put_1__VAL_1,
 		MUX_riscv_memory_response_put_1__VAL_2;
 
-  // declarations used by system tasks
-  // synopsys translate_off
-  reg TASK_testplusargs___d17;
-  reg TASK_testplusargs___d18;
-  reg TASK_testplusargs___d19;
-  reg [63 : 0] v__h1969;
-  reg TASK_testplusargs___d46;
-  reg TASK_testplusargs___d47;
-  reg TASK_testplusargs___d48;
-  reg [63 : 0] v__h2350;
-  reg TASK_testplusargs___d71;
-  reg TASK_testplusargs___d72;
-  reg TASK_testplusargs___d73;
-  reg [63 : 0] v__h2549;
-  reg TASK_testplusargs___d118;
-  reg TASK_testplusargs___d119;
-  reg TASK_testplusargs___d120;
-  reg [63 : 0] v__h4293;
-  reg TASK_testplusargs___d126;
-  reg TASK_testplusargs___d127;
-  reg TASK_testplusargs___d128;
-  reg [63 : 0] v__h4449;
-  reg TASK_testplusargs___d138;
-  reg TASK_testplusargs___d139;
-  reg TASK_testplusargs___d140;
-  reg [63 : 0] v__h2909;
-  reg TASK_testplusargs___d181;
-  reg TASK_testplusargs___d182;
-  reg TASK_testplusargs___d183;
-  reg [63 : 0] v__h5086;
-  reg TASK_testplusargs___d212;
-  reg TASK_testplusargs___d213;
-  reg TASK_testplusargs___d214;
-  reg [63 : 0] v__h5381;
-  reg TASK_testplusargs_6_OR_TASK_testplusargs_7_AND_ETC___d52;
-  reg TASK_testplusargs_6_OR_TASK_testplusargs_7_AND_ETC___d54;
-  reg TASK_testplusargs_6_OR_TASK_testplusargs_7_AND_ETC___d56;
-  reg TASK_testplusargs_6_OR_TASK_testplusargs_7_AND_ETC___d61;
-  reg riscv_memory_request_get_7_BITS_5_TO_4_0_EQ_1__ETC___d123;
-  reg riscv_memory_request_get_7_BITS_5_TO_4_0_EQ_1__ETC___d131;
-  reg NOT_riscv_memory_request_get_7_BITS_5_TO_4_0_E_ETC___d143;
-  reg TASK_testplusargs_6_OR_TASK_testplusargs_7_AND_ETC___d63;
-  reg TASK_testplusargs_6_OR_TASK_testplusargs_7_AND_ETC___d65;
-  reg TASK_testplusargs_81_OR_TASK_testplusargs_82_A_ETC___d187;
-  reg TASK_testplusargs_81_OR_TASK_testplusargs_82_A_ETC___d189;
-  reg TASK_testplusargs_81_OR_TASK_testplusargs_82_A_ETC___d191;
-  reg TASK_testplusargs_81_OR_TASK_testplusargs_82_A_ETC___d196;
-  reg TASK_testplusargs_81_OR_TASK_testplusargs_82_A_ETC___d198;
-  reg TASK_testplusargs_81_OR_TASK_testplusargs_82_A_ETC___d200;
-  reg TASK_testplusargs_12_OR_TASK_testplusargs_13_A_ETC___d218;
-  reg TASK_testplusargs_12_OR_TASK_testplusargs_13_A_ETC___d220;
-  reg TASK_testplusargs_12_OR_TASK_testplusargs_13_A_ETC___d222;
-  reg TASK_testplusargs_12_OR_TASK_testplusargs_13_A_ETC___d227;
-  // synopsys translate_on
-
   // remaining internal signals
   reg [31 : 0] CASE_ff_mem_requestD_OUT_BITS_2_TO_1_0_IF_ff__ETC__q3,
 	       w_wdata__h3100;
@@ -945,8 +857,6 @@ module mkeclass(CLK,
   assign WILL_FIRE_sb_ext_interrupt_put = EN_sb_ext_interrupt_put ;
 
   // actionvalue method io_dump_get
-  assign io_dump_get = riscv_dump_get ;
-  assign RDY_io_dump_get = riscv_RDY_dump_get ;
   assign CAN_FIRE_io_dump_get = riscv_RDY_dump_get ;
   assign WILL_FIRE_io_dump_get = EN_io_dump_get ;
 
@@ -991,7 +901,7 @@ module mkeclass(CLK,
 								 .DEQ(fetch_xactor_f_wr_data_DEQ),
 								 .CLR(fetch_xactor_f_wr_data_CLR),
 								 .D_OUT(fetch_xactor_f_wr_data_D_OUT),
-								 .FULL_N(),
+							
 								 .EMPTY_N(fetch_xactor_f_wr_data_EMPTY_N));
 
   // submodule fetch_xactor_f_wr_resp
@@ -1001,9 +911,8 @@ module mkeclass(CLK,
 								.ENQ(fetch_xactor_f_wr_resp_ENQ),
 								.DEQ(fetch_xactor_f_wr_resp_DEQ),
 								.CLR(fetch_xactor_f_wr_resp_CLR),
-								.D_OUT(),
-								.FULL_N(fetch_xactor_f_wr_resp_FULL_N),
-								.EMPTY_N());
+								
+								.FULL_N(fetch_xactor_f_wr_resp_FULL_N));
 
   // submodule ff_inst_access_fault
   FIFO2 #(.width(32'd1), .guarded(1'd1)) ff_inst_access_fault(.RST(RST_N),
@@ -1017,7 +926,7 @@ module mkeclass(CLK,
 							      .EMPTY_N(ff_inst_access_fault_EMPTY_N));
 
   // submodule ff_inst_request
-  FIFO2 #(.width(32'd34), .guarded(1'd1)) ff_inst_request(.RST(RST_N),
+  FIFO2 #(.width(32'd32), .guarded(1'd1)) ff_inst_request(.RST(RST_N),
 							  .CLK(CLK),
 							  .D_IN(ff_inst_request_D_IN),
 							  .ENQ(ff_inst_request_ENQ),
@@ -1105,40 +1014,30 @@ module mkeclass(CLK,
 								 .EMPTY_N(memory_xactor_f_wr_resp_EMPTY_N));
 
   // submodule riscv
-  mkriscv riscv(.resetpc(32'd4096),
-		.CLK(CLK),
-		.RST_N(RST_N),
-		.clint_msip_intrpt(riscv_clint_msip_intrpt),
-		.clint_mtime_c_mtime(riscv_clint_mtime_c_mtime),
-		.clint_mtip_intrpt(riscv_clint_mtip_intrpt),
-		.ext_interrupt_intrpt(riscv_ext_interrupt_intrpt),
-		.inst_response_put(riscv_inst_response_put),
-		.memory_response_put(riscv_memory_response_put),
-		.EN_inst_request_get(riscv_EN_inst_request_get),
-		.EN_inst_response_put(riscv_EN_inst_response_put),
-		.EN_memory_request_get(riscv_EN_memory_request_get),
-		.EN_memory_response_put(riscv_EN_memory_response_put),
-		.EN_clint_msip(riscv_EN_clint_msip),
-		.EN_clint_mtip(riscv_EN_clint_mtip),
-		.EN_clint_mtime(riscv_EN_clint_mtime),
-		.EN_ext_interrupt(riscv_EN_ext_interrupt),
-		.EN_dump_get(riscv_EN_dump_get),
-		.inst_request_get(riscv_inst_request_get),
-		.RDY_inst_request_get(riscv_RDY_inst_request_get),
-		.RDY_inst_response_put(riscv_RDY_inst_response_put),
-		.memory_request_get(riscv_memory_request_get),
-		.RDY_memory_request_get(riscv_RDY_memory_request_get),
-		.RDY_memory_response_put(),
-		.RDY_clint_msip(),
-		.RDY_clint_mtip(),
-		.RDY_clint_mtime(),
-		.RDY_ext_interrupt(),
-		.dump_get(riscv_dump_get),
-		.RDY_dump_get(riscv_RDY_dump_get),
-		.mv_curr_priv(riscv_mv_curr_priv),
-		.RDY_mv_curr_priv(),
-		.mv_trap(riscv_mv_trap),
-		.RDY_mv_trap());
+mkriscv riscv (
+    .resetpc(32'd4096),
+    .CLK(CLK),
+    .RST_N(RST_N),
+
+    // Instruction fetch handshake
+    .inst_request_get(riscv_inst_request_get),
+    .RDY_inst_request_get(riscv_RDY_inst_request_get),
+    .EN_inst_request_get(riscv_EN_inst_request_get),
+
+    // Instruction response handshake
+    .inst_response_put(riscv_inst_response_put),
+    .EN_inst_response_put(riscv_EN_inst_response_put),
+    .RDY_inst_response_put(riscv_RDY_inst_response_put),
+
+    // Data memory handshake
+    .memory_request_get(riscv_memory_request_get),
+    .RDY_memory_request_get(riscv_RDY_memory_request_get),
+    .EN_memory_request_get(riscv_EN_memory_request_get),
+
+    .memory_response_put(riscv_memory_response_put),
+    .EN_memory_response_put(riscv_EN_memory_response_put),
+    .RDY_memory_response_put(riscv_RDY_memory_response_put)
+);
 
   // rule RL_update_epochs
   assign CAN_FIRE_RL_update_epochs = riscv_mv_trap ;
@@ -2313,4 +2212,3 @@ module mkeclass(CLK,
   end
   // synopsys translate_on
 endmodule  // mkeclass
-

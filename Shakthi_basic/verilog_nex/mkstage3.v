@@ -629,45 +629,29 @@ module mkstage3(CLK,
   assign mv_curr_priv = csr_mv_curr_priv ;
   assign RDY_mv_curr_priv = 1'd1 ;
 
-// submodule csr
-  mkcsr csr(.CLK(CLK),
-      .RST_N(RST_N),
-      .clint_msip_intrpt(csr_clint_msip_intrpt),
-      // .clint_mtime_c_mtime(csr_clint_mtime_c_mtime), // Removed connection
-      .clint_mtip_intrpt(csr_clint_mtip_intrpt),
-      .ext_interrupt_ex_i(csr_ext_interrupt_ex_i),
-      .system_instruction_csr_address(csr_system_instruction_csr_address),
-      .system_instruction_funct3(csr_system_instruction_funct3),
-      .system_instruction_lpc(csr_system_instruction_lpc),
-      .system_instruction_op1(csr_system_instruction_op1),
-      .take_trap_badaddr(csr_take_trap_badaddr),
-      .take_trap_pc(csr_take_trap_pc),
-      .take_trap_type_cause(csr_take_trap_type_cause),
-      .EN_system_instruction(csr_EN_system_instruction),
-      .EN_take_trap(csr_EN_take_trap),
-      .EN_clint_msip(csr_EN_clint_msip),
-      .EN_clint_mtip(csr_EN_clint_mtip),
-      // .EN_clint_mtime(csr_EN_clint_mtime), // Removed connection
-      // .EN_incr_minstret(csr_EN_incr_minstret), // Removed connection
-      .EN_ext_interrupt(csr_EN_ext_interrupt),
-      .system_instruction(csr_system_instruction),
-      .RDY_system_instruction(),
-      // .mv_csr_decode(csr_mv_csr_decode), // Removed connection
-      // .RDY_mv_csr_decode(), // Removed connection
-      .take_trap(csr_take_trap),
-      .RDY_take_trap(),
-      .RDY_clint_msip(),
-      .RDY_clint_mtip(),
-      // .RDY_clint_mtime(), // Removed connection
-      // .RDY_incr_minstret(), // Removed connection
-      .RDY_ext_interrupt(),
-      .mv_csr_misa_c(csr_mv_csr_misa_c),
-      .RDY_mv_csr_misa_c(),
-      .mv_interrupt(csr_mv_interrupt),
-      // .mv_curr_priv(csr_mv_curr_priv), // Removed connection
-      // .RDY_mv_curr_priv(), // Removed connection
-      .csr_mstatus(),
-      .RDY_csr_mstatus());
+// Submodule CSR - Corrected Instantiation
+mkcsr csr (
+    .CLK(CLK),
+    .RST_N(RST_N),
+
+    // Core Interface
+    .csr_addr(system_instruction_csr_address),
+    .csr_wdata(system_instruction_op1),
+    .csr_wen(system_instruction_funct3 != 3'd0),
+    .csr_rdata(system_instruction),
+    .csr_valid(RDY_system_instruction),
+
+    // Trap Interface
+    .trap_cause(take_trap_type_cause),
+    .trap_pc(take_trap_pc),
+    .trap_handler(take_trap),
+
+    // Interrupt Interface
+    .ext_irq(ext_interrupt_ex_i),
+    .pending_irq(mv_interrupt)
+
+    // NO CLINT PORTS HERE!
+);
 
   // submodule dump_ff
   FIFOL1 #(.width(32'd103)) dump_ff(.RST(RST_N),

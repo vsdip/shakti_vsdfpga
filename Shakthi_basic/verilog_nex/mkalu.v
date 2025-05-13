@@ -15,7 +15,7 @@ module mkalu(
     input CLK,
     input RST_N,
 
-    // actionvalue method inputs
+    // Actionvalue method inputs
     input [3 : 0] inputs_fn,
     input [31 : 0] inputs_op1,
     input [31 : 0] inputs_op2,
@@ -33,42 +33,56 @@ module mkalu(
     output reg RDY_inputs
 );
 
-  // Internal signals for ALU output
-  wire [73 : 0] fn_alu_output;
+  // Simplified ALU operation decoding
+  wire [2:0] funct3 = inputs_funct3;
+  wire funct7 = inputs_fn[3];  // Use MSB of fn for ADD/SUB distinction
 
-  // Rule scheduling signals (not strictly needed for a purely combinational ALU output)
-  // wire CAN_FIRE_inputs, WILL_FIRE_inputs;
+  // ALU operations
+  wire [31:0] add_sub = inputs_op1 + (funct7 ? ~inputs_op2 + 1 : inputs_op2);
+  wire [31:0] sll = inputs_op1 << inputs_op2[4:0];
+  wire [31:0] srl = inputs_op1 >> inputs_op2[4:0];
+  wire [31:0] sra = $signed(inputs_op1) >>> inputs_op2[4:0];
+  wire        slt = $signed(inputs_op1) < $signed(inputs_op2);
+  wire        sltu = inputs_op1 < inputs_op2;
 
-  // Instantiate the simplified ALU module
-  reduced_fn_alu instance_fn_alu_0(
-    .fn_alu_fn(inputs_fn),
-    .fn_alu_op1(inputs_op1),
-    .fn_alu_op2(inputs_op2),
-    .fn_alu_op3(inputs_op3),
-    .fn_alu_imm_value(inputs_imm_value),
-    .fn_alu_inst_type(inputs_inst_type),
-    .fn_alu_funct3(inputs_funct3),
-    .fn_alu_memaccess(inputs_memaccess),
-    .fn_alu_misa_c(inputs_misa_c),
-    .fn_alu_lpc(inputs_lpc),
-    .fn_alu(fn_alu_output)
-  );
+  // Main ALU result
+  reg [31:0] alu_result;
+  always @(*) begin
+    case(funct3)
+      3'b000: alu_result = add_sub;       // ADD/SUB
+      3'b001: alu_result = sll;           // SLL
+      3'b010: alu_result = {31'b0, slt};  // SLT
+      3'b011: alu_result = {31'b0, sltu}; // SLTU
+      3'b100: alu_result = inputs_op1 ^ inputs_op2; // XOR
+      3'b101: alu_result = funct7 ? sra : srl;      // SRL/SRA
+      3'b110: alu_result = inputs_op1 | inputs_op2; // OR
+      3'b111: alu_result = inputs_op1 & inputs_op2; // AND
+      default: alu_result = 32'b0;
+    endcase
+  end
 
-  // Reset logic and output assignment
-  always @(posedge CLK or negedge RST_N) begin
-    if (~RST_N) begin
-      // Reset outputs to a safe state
-      inputs <= 74'd0;
-      RDY_inputs <= 1'b0;
+  // Effective address calculation (for load/store)
+  wire [31:0] effective_addr = inputs_op1 + inputs_imm_value;
+
+  // Output construction (preserve original format)
+  always @(*) begin
+    inputs[73]    = 1'b1;                  // done flag
+    inputs[72:71] = 2'b00;                 // cmtype (regular)
+    inputs[70:39] = alu_result;            // aluresult
+    inputs[38:7]  = effective_addr;        // effective address
+    inputs[6:1]   = 6'b0;                  // cause (no exceptions)
+    inputs[0]     = (funct3 == 3'b000) &&  // redirect (for branches)
+                    (inputs_inst_type == 3'b010) && 
+                    (|alu_result);
+  end
+
+  // Reset and control logic
+  always @(posedge CLK or `BSV_RESET_EDGE RST_N) begin
+    if (RST_N == `BSV_RESET_VALUE) begin
+      RDY_inputs <= `BSV_ASSIGNMENT_DELAY 1'b0;
     end else begin
-      // Update outputs based on inputs and ALU calculation
-      inputs <= fn_alu_output;
-      RDY_inputs <= EN_inputs;  // Indicate ready when enabled
+      RDY_inputs <= `BSV_ASSIGNMENT_DELAY EN_inputs;
     end
   end
 
-  // Fire conditions based on input enable (if you have Bluespec rules)
-  // assign CAN_FIRE_inputs = EN_inputs;  // Can fire as long as enabled
-  // assign WILL_FIRE_inputs = EN_inputs; // Will fire when inputs are enabled
-
-endmodule // mkalu
+endmodule

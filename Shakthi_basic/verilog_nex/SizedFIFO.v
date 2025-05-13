@@ -66,6 +66,7 @@ module SizedFIFO(CLK, RST, D_IN, ENQ, FULL_N, D_OUT, DEQ, EMPTY_N, CLR);
 
    reg [p1width - 1 : 0]     D_OUT;
    reg                       hasodata;
+   parameter init = 0;  // Patch for yosys defparam
 
    wire [p3cntr_width-1:0]   depthLess2 = p2depth2[p3cntr_width-1:0] ;
 
